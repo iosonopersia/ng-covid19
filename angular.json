@@ -29,7 +29,8 @@
               "./node_modules/leaflet/dist/leaflet.css"
             ],
             "scripts": [
-              "src/assets/sepa.js"
+              "src/assets/sepa.js",
+              "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js"
             ]
           },
           "configurations": {
@@ -97,7 +98,8 @@
               "./node_modules/leaflet/dist/leaflet.css"
             ],
             "scripts": [
-              "src/assets/sepa.js"
+              "src/assets/sepa.js",
+              "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js"
             ]
           }
         },
