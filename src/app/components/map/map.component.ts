@@ -54,7 +54,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.italyMarker.removeFrom(this.map);
         this.italyMarker = null;
       }
-      this.drawMarkers(places);
+      this.drawMarkers(places.toArray());
     });
   }
 
