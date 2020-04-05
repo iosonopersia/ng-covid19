@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MapComponent } from './components/map/map.component';
 import { PlotComponent } from './components/plot/plot.component';
+import { HeaderComponent } from './components/shared/header/header.component';
 
 // La distro 'basic' di plotly mette a disposizione solamente 'scatter', 'bar' e 'pie'
 import { PlotlyViaWindowModule } from 'angular-plotly.js';
@@ -14,7 +15,8 @@ import { PlotlyViaWindowModule } from 'angular-plotly.js';
   declarations: [
     AppComponent,
     MapComponent,
-    PlotComponent
+    PlotComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
