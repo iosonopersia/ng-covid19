@@ -5,7 +5,7 @@ import {
   AfterViewInit,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import * as L from 'leaflet';
 import { IMapPlace } from 'src/app/services/SEPA/queryResults.model';
@@ -14,6 +14,11 @@ export interface IMarker {
   id: number;
   bigCircle: L.Circle;
   smallCircle: L.Circle;
+}
+
+export interface IPlaceURIandName {
+  placeURI: string;
+  placeName: string;
 }
 
 @Component({
@@ -26,13 +31,13 @@ export class MapComponent implements OnInit, AfterViewInit {
   private map: L.Map;
   private markers: IMarker[];
   private italyMarker: L.Marker;
-  @Output() public selectedPlace: EventEmitter<string>;
+  @Output() public selectedPlace: EventEmitter<IPlaceURIandName>;
 
   constructor(private sepaSubs: SEPASubscriptionsService) {
     this.map = undefined;
     this.markers = [];
     this.italyMarker = undefined;
-    this.selectedPlace = new EventEmitter<string>();
+    this.selectedPlace = new EventEmitter<IPlaceURIandName>();
   }
 
   ngOnInit(): void {}
@@ -91,9 +96,9 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.italyMarker = L.marker([place.lat.value, place.lon.value], {
         title: name,
         icon: italyIcon
-      }).on('click', () => {
-        this.selectedPlace.emit(place.place.value);
-      }).addTo(this.map);
+      })
+        .on('click', () => this.emitClickEvent(place))
+        .addTo(this.map);
 
       return;
     }
@@ -114,9 +119,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         fillOpacity: 0.2
       }
     );
-    bigCircle.on('click', () => {
-      this.selectedPlace.emit(place.place.value);
-    });
+    bigCircle.on('click', () => this.emitClickEvent(place));
     this.map.addLayer(bigCircle);
 
     // Draw a little dot inside of the big circle
@@ -131,9 +134,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         fillOpacity: 1
       }
     );
-    smallCircle.on('click', () => {
-      this.selectedPlace.emit(place.place.value);
-    });
+    smallCircle.on('click', () => this.emitClickEvent(place));
     this.map.addLayer(smallCircle);
 
     this.markers.push({
@@ -141,5 +142,13 @@ export class MapComponent implements OnInit, AfterViewInit {
       bigCircle,
       smallCircle
     });
+  }
+
+  private emitClickEvent(place: IMapPlace) {
+    const event: IPlaceURIandName = {
+      placeURI: place.place.value,
+      placeName: place.name.value
+    };
+    this.selectedPlace.emit(event);
   }
 }
