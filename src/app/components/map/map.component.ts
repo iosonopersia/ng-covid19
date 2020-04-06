@@ -8,7 +8,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import * as L from 'leaflet';
-import { IPlace } from 'src/app/services/SEPA/sepa.model';
+import { IMapPlace } from 'src/app/services/SEPA/queryResults.model';
 
 export interface IMarker {
   id: number;
@@ -74,7 +74,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.map.addLayer(cartodbPositron);
   }
 
-  private drawMarkers(places: IPlace[]): void {
+  private drawMarkers(places: IMapPlace[]): void {
     if (places) {
       places.forEach(place => {
         this.addMarker(place);
@@ -82,7 +82,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private addMarker(place: IPlace) {
+  private addMarker(place: IMapPlace) {
     if (place.place.value === 'http://covid19/context/country/ITA') {
       const italyIcon = L.icon({
         iconUrl: 'assets/italyFlag.png',

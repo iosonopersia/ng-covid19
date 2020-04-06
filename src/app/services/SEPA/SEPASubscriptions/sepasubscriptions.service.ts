@@ -1,8 +1,9 @@
-import { IObservation, IPlace } from './../sepa.model';
 import { Injectable } from '@angular/core';
 import { jsap } from './../jsap';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { List } from 'immutable';
+import { IObservation, IMapPlace } from '../queryResults.model';
+import { IQueryResult } from '../sepa.model';
 
 declare const Sepajs: any; // Global variable defined in src/assets/sepa.js
 
@@ -25,9 +26,9 @@ export class SEPASubscriptionsService {
   istatObservations$: Observable<List<IObservation>>;
 
   // <http://covid19/context> dataset
-  private places: List<IPlace>;
-  private PLACES: Subject<List<IPlace>>;
-  places$: Observable<List<IPlace>>;
+  private places: List<IMapPlace>;
+  private PLACES: Subject<List<IMapPlace>>;
+  places$: Observable<List<IMapPlace>>;
 
   constructor() {
     this.prefixes = '';
@@ -55,13 +56,13 @@ export class SEPASubscriptionsService {
     this.istatObservations$ = this.ISTAT_OBSERVATIONS.asObservable();
 
     // <http://covid19/context> dataset
-    this.places = List<IPlace>(); // empty list
-    this.PLACES = new BehaviorSubject<List<IPlace>>(this.places);
+    this.places = List<IMapPlace>(); // empty list
+    this.PLACES = new BehaviorSubject<List<IMapPlace>>(this.places);
     this.places$ = this.PLACES.asObservable();
   }
 
   subscribe() {
-    let query =
+    let query: string =
       this.prefixes +
       ' ' +
       this.bench.sparql(jsap.queries.OBSERVATIONS.sparql, {
@@ -84,7 +85,7 @@ export class SEPASubscriptionsService {
       });
 
     let subscription = this.sepa.subscribe(query, jsap);
-    subscription.on('added', (addedResults) => {
+    subscription.on('added', (addedResults: IQueryResult<IObservation>) => {
       if (addedResults?.results?.bindings) {
         this.onCovid19Observations(addedResults.results.bindings);
       }
@@ -113,21 +114,21 @@ export class SEPASubscriptionsService {
       });
 
     subscription = this.sepa.subscribe(query, jsap);
-    subscription.on('added', (addedResults) => {
+    subscription.on('added', (addedResults: IQueryResult<IObservation>) => {
       if (addedResults?.results?.bindings) {
-        this.onIstatObservations(addedResults.results.binding);
+        this.onIstatObservations(addedResults.results.bindings);
       }
     });
 
     query = this.prefixes + ' ' + jsap.queries.MAP_PLACES.sparql;
 
     subscription = this.sepa.subscribe(query, jsap);
-    subscription.on('added', (addedResults) => {
+    subscription.on('added', (addedResults: IQueryResult<IMapPlace>) => {
       if (addedResults?.results?.bindings) {
         this.onAddedPlaces(addedResults.results.bindings);
       }
     });
-    subscription.on('removed', (removedResults) => {
+    subscription.on('removed', (removedResults: IQueryResult<IMapPlace>) => {
       if (removedResults?.results?.bindings) {
         this.onRemovedPlaces(removedResults.results.bindings);
       }
@@ -137,7 +138,7 @@ export class SEPASubscriptionsService {
   private onCovid19Observations(bindings: IObservation[]) {
     // Update the array
     for (const observation of bindings) {
-      const index = this.covid19Observations.findIndex(
+      const index: number = this.covid19Observations.findIndex(
         (value: IObservation) => {
           return observation.observation === value.observation;
         }
@@ -158,7 +159,7 @@ export class SEPASubscriptionsService {
   private onIstatObservations(bindings: IObservation[]) {
     // Update the array
     for (const observation of bindings) {
-      const index = this.istatObservations.findIndex((value: IObservation) => {
+      const index: number = this.istatObservations.findIndex((value: IObservation) => {
         return observation.observation === value.observation;
       });
       if (index === -1) {
@@ -171,10 +172,10 @@ export class SEPASubscriptionsService {
     this.ISTAT_OBSERVATIONS.next(this.istatObservations);
   }
 
-  private onAddedPlaces(bindings: IPlace[]) {
+  private onAddedPlaces(bindings: IMapPlace[]) {
     // Update the array
     for (const place of bindings) {
-      const index = this.places.findIndex((value: IPlace) => {
+      const index: number = this.places.findIndex((value: IMapPlace) => {
         return place.place === value.place;
       });
       if (index === -1) {
@@ -187,10 +188,10 @@ export class SEPASubscriptionsService {
     this.PLACES.next(this.places);
   }
 
-  private onRemovedPlaces(bindings: IPlace[]) {
+  private onRemovedPlaces(bindings: IMapPlace[]) {
     // Update the array
     for (const place of bindings) {
-      const index = this.places.findIndex((value: IPlace) => {
+      const index: number = this.places.findIndex((value: IMapPlace) => {
         return place.place === value.place;
       });
       if (index !== -1) {
