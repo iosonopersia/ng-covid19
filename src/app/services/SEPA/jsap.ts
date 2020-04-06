@@ -84,7 +84,7 @@ export const jsap = {
     },
     CONTAINED_PLACES: {
       sparql:
-        'SELECT * WHERE {GRAPH <http://covid19/context> {?child gn:parentFeature ?root ; gn:name ?name}}',
+        'SELECT ?child ?name (COUNT(?grandChild) as ?numOfChildren) WHERE {GRAPH <http://covid19/context> {?child gn:parentFeature ?root ;gn:name ?name .OPTIONAL {?grandChild gn:parentFeature ?child .}}} GROUP BY ?child ?name',
       forcedBindings: {
         root: {
           type: 'uri',
