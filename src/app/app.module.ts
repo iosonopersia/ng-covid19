@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MapComponent } from './components/map/map.component';
 import { HomePageComponent } from './components/home-page/home-page.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { PlotComponent } from './components/plot/plot.component';
 import { HeaderComponent } from './components/shared/header/header.component';
 import { PageComponent } from './components/shared/page/page.component';
@@ -20,7 +21,8 @@ import { PlotlyViaWindowModule } from 'angular-plotly.js';
     PlotComponent,
     HeaderComponent,
     PageComponent,
-    HomePageComponent
+    HomePageComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
