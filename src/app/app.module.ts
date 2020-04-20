@@ -8,7 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MapComponent } from './components/map/map.component';
-import { HomePageComponent } from './components/home-page/home-page.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { PlotComponent } from './components/plot/plot.component';
 import { HeaderComponent } from './pages/shared/header/header.component';

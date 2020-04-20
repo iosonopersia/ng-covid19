@@ -7,20 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home-page.component.css']
 })
 export class HomePageComponent implements OnInit {
-  placesNumber: number;
-
-  constructor(private serv: SEPASubscriptionsService) {
-    this.placesNumber = 0;
-  }
+  constructor(private sepaSubs: SEPASubscriptionsService) {}
 
   ngOnInit(): void {
-    this.serv.places$.subscribe(value => {
-      this.placesNumber = value.size;
-    });
-    this.serv.subscribe();
-  }
-
-  onSelectedPlace(placeID: string): void {
-    alert('Selected: ' + placeID);
+    this.sepaSubs.startSubscriptions();
   }
 }
