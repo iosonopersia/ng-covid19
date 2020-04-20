@@ -1,24 +1,20 @@
+import { SharedStateService } from './../../services/SharedState/shared-state.service';
+import { IPlaceNode } from './../../services/SEPA/queryResults.model';
 import { SEPASubscriptionsService } from './../../services/SEPA/SEPASubscriptions/sepasubscriptions.service';
 import {
   Component,
-  OnInit,
   AfterViewInit,
-  Output,
-  EventEmitter,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  OnDestroy
 } from '@angular/core';
 import * as L from 'leaflet';
 import { IMapPlace } from 'src/app/services/SEPA/queryResults.model';
+import { Subscription } from 'rxjs';
 
 export interface IMarker {
   id: number;
   bigCircle: L.Circle;
   smallCircle: L.Circle;
-}
-
-export interface IPlaceURIandName {
-  placeURI: string;
-  placeName: string;
 }
 
 @Component({
@@ -27,40 +23,46 @@ export interface IPlaceURIandName {
   styleUrls: ['./map.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
   private map: L.Map;
   private markers: IMarker[];
   private italyMarker: L.Marker;
-  @Output() public selectedPlace: EventEmitter<IPlaceURIandName>;
+  private subscriptions: Subscription;
 
-  constructor(private sepaSubs: SEPASubscriptionsService) {
+  constructor(private sepaSubs: SEPASubscriptionsService, private sharedState: SharedStateService) {
     this.map = undefined;
     this.markers = [];
     this.italyMarker = undefined;
-    this.selectedPlace = new EventEmitter<IPlaceURIandName>();
+    this.subscriptions = new Subscription();
   }
 
-  ngOnInit(): void {}
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
-    this.sepaSubs.places$.subscribe(places => {
-      if (this.markers.length < 1) {
-        this.markers.forEach(marker => {
-          marker.bigCircle.off('click');
-          marker.smallCircle.off('click');
-          marker.bigCircle.removeFrom(this.map);
-          marker.smallCircle.removeFrom(this.map);
-        });
-        this.markers = [];
-      }
-      if (this.italyMarker) {
-        this.italyMarker.off('click');
-        this.italyMarker.removeFrom(this.map);
-        this.italyMarker = null;
-      }
+    this.subscriptions = this.sepaSubs.places$.subscribe(places => {
+      this.clearMarkers();
       this.drawMarkers(places.toArray());
     });
+  }
+
+  private clearMarkers() {
+    if (this.markers) {
+      this.markers.forEach(marker => {
+        marker.bigCircle.off('click');
+        marker.smallCircle.off('click');
+        marker.bigCircle.removeFrom(this.map);
+        marker.smallCircle.removeFrom(this.map);
+      });
+      this.markers = [];
+    }
+    if (this.italyMarker) {
+      this.italyMarker.off('click');
+      this.italyMarker.removeFrom(this.map);
+      this.italyMarker = null;
+    }
   }
 
   private initMap(): void {
@@ -145,10 +147,10 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   private emitClickEvent(place: IMapPlace) {
-    const event: IPlaceURIandName = {
+    const selectedPlace: IPlaceNode = {
       placeURI: place.place.value,
-      placeName: place.name.value
+      placeLabel: place.name.value
     };
-    this.selectedPlace.emit(event);
+    this.sharedState.onMapSelectedPlace(selectedPlace);
   }
 }
