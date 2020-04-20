@@ -1,16 +1,14 @@
+import { IPlaceTree, IHistory } from 'src/app/services/SEPA/queryResults.model';
+import { IPlaceNode } from './../queryResults.model';
 import { IQueryResult } from './../sepa.model';
 import { Injectable } from '@angular/core';
 import { jsap } from '../jsap';
-import { List } from 'immutable';
 import { IContainedPlace } from '../queryResults.model';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { List } from 'immutable';
 
 declare const Sepajs: any; // Global variable defined in src/assets/sepa.js
-
-export interface IPlaceTree {
-  placeURI: string;
-  placeName: string;
-  children: IPlaceTree[];
-}
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +17,17 @@ export class SEPAQueriesService {
   private prefixes: string;
   private sepa: any;
   private bench: any;
+
+  private historyStart: Date = new Date(2020, 1, 24); // 24 febbraio 2020 (la numerazione dei mesi parte da 0)
+  private historyEnd: Date = new Date();
+
+  private tree: IPlaceTree;
+  placeTree$: Observable<IPlaceTree>;
+  private PLACE_TREE: BehaviorSubject<IPlaceTree>;
+
+  private history: List<IHistory>;
+  history$: Observable<List<IHistory>>;
+  private HISTORY: BehaviorSubject<List<IHistory>>;
 
   constructor() {
     this.prefixes = '';
@@ -30,25 +39,32 @@ export class SEPAQueriesService {
 
     this.sepa = Sepajs.client;
     this.bench = new Sepajs.bench();
+
+    this.PLACE_TREE = new BehaviorSubject<IPlaceTree>(null);
+    this.placeTree$ = this.PLACE_TREE.asObservable().pipe(filter(tree => tree !== null));
+
+    this.history = List<IHistory>(); // Empty list
+    this.HISTORY = new BehaviorSubject<List<IHistory>>(this.history);
+    this.history$ = this.HISTORY.asObservable();
   }
 
   queryHistory(
     place: string,
-    property: string,
-    from: string,
-    to: string
-  ): Promise<any> {
+    property: string
+  ) {
+    const historyStart = this.historyStart.toISOString();
+    const historyEnd = this.historyEnd.toISOString();
     const query: string =
       this.prefixes +
       ' ' +
       this.bench.sparql(jsap.queries.HISTORY.sparql, {
         from: {
           type: 'DateTime',
-          value: '\'' + from + '\'^^xsd:dateTime',
+          value: '\'' + historyStart + '\'^^xsd:dateTime',
         },
         to: {
           type: 'DateTime',
-          value: '\'' + to + '\'^^xsd:dateTime',
+          value: '\'' + historyEnd + '\'^^xsd:dateTime',
         },
         place: {
           type: 'uri',
@@ -60,23 +76,33 @@ export class SEPAQueriesService {
         },
       });
 
-    return this.sepa.query(query, jsap).then((data) => {
-      return data;
+    this.sepa.query(query, jsap).then((data: IQueryResult<IHistory>) => {
+      if (!data?.results?.bindings) {
+        throw new Error('Data retrieved is not valid');
+      }
+      this.history = this.history.clear();
+      for (const binding of data.results.bindings) {
+        this.history = this.history.push(binding);
+      }
+      this.HISTORY.next(this.history);
     });
   }
 
-  queryPlaceTree(placeURI: string, placeName: string): Promise<IPlaceTree> {
-    const tree: IPlaceTree = {
-      placeURI,
-      placeName,
+  queryPlaceTree(place: IPlaceNode) {
+    if (this.tree) {
+      return;
+    }
+
+    this.tree = {
+      node: {
+        placeURI: place.placeURI,
+        placeLabel: place.placeLabel
+      },
       children: [],
     };
 
-    // We return a Promise which, when resolved, will return
-    // a reference to the 'tree' object from thisf local context.
-    return this.queryPlaceChildren(placeURI, tree.children).then(() => {
-      console.log(tree);
-      return tree;
+    this.queryPlaceChildren(place.placeURI, this.tree.children).then(() => {
+      this.PLACE_TREE.next(this.tree);
     });
   }
 
@@ -90,7 +116,7 @@ export class SEPAQueriesService {
      * So we must define how to do it:
      * 1) we return the 'this.sepa.query(...)' Promise;
      * 2) later on, the 'this.sepa.query(...)' Promise is resolved;
-     * 3) then we populate placeURI and placeName fields of every child node;
+     * 3) then we populate placeURI and placeLabel fields of every child node;
      * 4) in order to populate also the 'children' field of every child node
      *    we have to recursively call queryPlaceChildren(), which in turn promises
      *    us to fill that field;
@@ -123,8 +149,10 @@ export class SEPAQueriesService {
         for (const place of data.results.bindings) {
           // STEP 3)
           const child: IPlaceTree = {
-            placeURI: place.child.value,
-            placeName: place.name.value,
+            node: {
+              placeURI: place.child.value,
+              placeLabel: place.name.value
+            },
             children: [],
           };
           childrenNodes.push(child);
@@ -133,7 +161,7 @@ export class SEPAQueriesService {
           const numOfChildren: number = parseInt(place.numOfChildren.value, 10);
           if (numOfChildren > 0) {
             promises.push(
-              this.queryPlaceChildren(child.placeURI, child.children)
+              this.queryPlaceChildren(child.node.placeURI, child.children)
             );
           }
         }

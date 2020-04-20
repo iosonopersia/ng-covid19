@@ -14,16 +14,17 @@ export class SEPASubscriptionsService {
   private prefixes: string;
   private sepa: any;
   private bench: any;
+  private dataLoaded: boolean;
 
   // <http://covid19/observation> dataset
-  private covid19Observations: List<IObservation>;
-  private COVID19_OBSERVATIONS: Subject<List<IObservation>>;
-  covid19Observations$: Observable<List<IObservation>>;
+  private covid19Observations: Map<string, List<IObservation>>;
+  private COVID19_OBSERVATIONS: Subject<Map<string, List<IObservation>>>;
+  covid19Observations$: Observable<Map<string, List<IObservation>>>;
 
   // <http://istat/demographics> dataset
-  private istatObservations: List<IObservation>;
-  private ISTAT_OBSERVATIONS: Subject<List<IObservation>>;
-  istatObservations$: Observable<List<IObservation>>;
+  private istatObservations: Map<string, List<IObservation>>;
+  private ISTAT_OBSERVATIONS: Subject<Map<string, List<IObservation>>>;
+  istatObservations$: Observable<Map<string, List<IObservation>>>;
 
   // <http://covid19/context> dataset
   private places: List<IMapPlace>;
@@ -32,6 +33,8 @@ export class SEPASubscriptionsService {
 
   constructor() {
     this.prefixes = '';
+
+    this.dataLoaded = false;
 
     // tslint:disable-next-line: forin
     for (const ns in jsap.namespaces) {
@@ -42,17 +45,17 @@ export class SEPASubscriptionsService {
     this.bench = new Sepajs.bench();
 
     // <http://covid19/observation> dataset
-    this.covid19Observations = List<IObservation>(); // empty list
-    this.COVID19_OBSERVATIONS = new BehaviorSubject<List<IObservation>>(
-      this.covid19Observations
-    );
+    this.covid19Observations = new Map<string, List<IObservation>>(); // empty list
+    this.COVID19_OBSERVATIONS = new BehaviorSubject<
+      Map<string, List<IObservation>>
+    >(this.covid19Observations);
     this.covid19Observations$ = this.COVID19_OBSERVATIONS.asObservable();
 
     // <http://istat/demographics> dataset
-    this.istatObservations = List<IObservation>(); // empty list
-    this.ISTAT_OBSERVATIONS = new BehaviorSubject<List<IObservation>>(
-      this.istatObservations
-    );
+    this.istatObservations = new Map<string, List<IObservation>>(); // empty list
+    this.ISTAT_OBSERVATIONS = new BehaviorSubject<
+      Map<string, List<IObservation>>
+    >(this.istatObservations);
     this.istatObservations$ = this.ISTAT_OBSERVATIONS.asObservable();
 
     // <http://covid19/context> dataset
@@ -61,8 +64,29 @@ export class SEPASubscriptionsService {
     this.places$ = this.PLACES.asObservable();
   }
 
-  subscribe() {
-    let query: string =
+  startSubscriptions() {
+    // Ensure that this function gets called only once:
+    if (this.dataLoaded) {
+      return;
+    } else {
+      this.dataLoaded = true;
+    }
+
+    let query: string = this.prefixes + ' ' + jsap.queries.MAP_PLACES.sparql;
+
+    let subscription = this.sepa.subscribe(query, jsap);
+    subscription.on('added', (addedResults: IQueryResult<IMapPlace>) => {
+      if (addedResults?.results?.bindings) {
+        this.onAddedPlaces(addedResults.results.bindings);
+      }
+    });
+    subscription.on('removed', (removedResults: IQueryResult<IMapPlace>) => {
+      if (removedResults?.results?.bindings) {
+        this.onRemovedPlaces(removedResults.results.bindings);
+      }
+    });
+
+    query =
       this.prefixes +
       ' ' +
       this.bench.sparql(jsap.queries.OBSERVATIONS.sparql, {
@@ -84,7 +108,7 @@ export class SEPASubscriptionsService {
         }
       });
 
-    let subscription = this.sepa.subscribe(query, jsap);
+    subscription = this.sepa.subscribe(query, jsap);
     subscription.on('added', (addedResults: IQueryResult<IObservation>) => {
       if (addedResults?.results?.bindings) {
         this.onCovid19Observations(addedResults.results.bindings);
@@ -119,38 +143,27 @@ export class SEPASubscriptionsService {
         this.onIstatObservations(addedResults.results.bindings);
       }
     });
-
-    query = this.prefixes + ' ' + jsap.queries.MAP_PLACES.sparql;
-
-    subscription = this.sepa.subscribe(query, jsap);
-    subscription.on('added', (addedResults: IQueryResult<IMapPlace>) => {
-      if (addedResults?.results?.bindings) {
-        this.onAddedPlaces(addedResults.results.bindings);
-      }
-    });
-    subscription.on('removed', (removedResults: IQueryResult<IMapPlace>) => {
-      if (removedResults?.results?.bindings) {
-        this.onRemovedPlaces(removedResults.results.bindings);
-      }
-    });
   }
 
   private onCovid19Observations(bindings: IObservation[]) {
     // Update the array
     for (const observation of bindings) {
-      const index: number = this.covid19Observations.findIndex(
-        (value: IObservation) => {
-          return observation.observation === value.observation;
-        }
-      );
-      if (index === -1) {
-        this.covid19Observations = this.covid19Observations.push(observation);
-      } else {
-        this.covid19Observations = this.covid19Observations.set(
-          index,
-          observation
-        );
+      let obsList = this.covid19Observations.get(observation.place.value);
+      if (!obsList) {
+        obsList = List<IObservation>(); // Empty list
       }
+      const index: number = obsList.findIndex((value: IObservation) => {
+        return observation.observation === value.observation;
+      });
+      if (index === -1) {
+        obsList = obsList.push(observation);
+      } else {
+        obsList = obsList.set(index, observation);
+      }
+      this.covid19Observations = this.covid19Observations.set(
+        observation.place.value,
+        obsList
+      );
     }
     // Notify subscribers
     this.COVID19_OBSERVATIONS.next(this.covid19Observations);
@@ -159,14 +172,22 @@ export class SEPASubscriptionsService {
   private onIstatObservations(bindings: IObservation[]) {
     // Update the array
     for (const observation of bindings) {
-      const index: number = this.istatObservations.findIndex((value: IObservation) => {
+      let obsList = this.istatObservations.get(observation.place.value);
+      if (!obsList) {
+        obsList = List<IObservation>(); // Empty list
+      }
+      const index: number = obsList.findIndex((value: IObservation) => {
         return observation.observation === value.observation;
       });
       if (index === -1) {
-        this.istatObservations = this.istatObservations.push(observation);
+        obsList = obsList.push(observation);
       } else {
-        this.istatObservations = this.istatObservations.set(index, observation);
+        obsList = obsList.set(index, observation);
       }
+      this.istatObservations = this.istatObservations.set(
+        observation.place.value,
+        obsList
+      );
     }
     // Notify subscribers
     this.ISTAT_OBSERVATIONS.next(this.istatObservations);

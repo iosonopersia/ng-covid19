@@ -35,3 +35,30 @@ export interface IMapPlace {
   res: IGraphData;
   cases: IGraphData;
 }
+
+export interface ITree<T> {
+  node: T;
+  children: ITree<T>[];
+}
+
+export interface IPlaceNode {
+  placeURI: string;
+  placeLabel: string;
+}
+
+export type IPlaceTree = ITree<IPlaceNode>;
+
+// Query: HISTORY
+export interface IHistory {
+  a: IGraphData;
+  timestamp: IGraphData;
+  res: IGraphData;
+  type: IGraphData;
+  unit: IGraphData;
+  value: IGraphData;
+}
+
+export interface IProperty {
+  propertyURI: string;
+  propertyLabel: string;
+}

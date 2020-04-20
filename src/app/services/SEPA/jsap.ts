@@ -58,7 +58,7 @@ export const jsap = {
     },
     HISTORY: {
       sparql:
-        'SELECT * WHERE {  GRAPH <http://covid19/observation/history> {    ?a rdf:type sosa:Observation;    	sosa:resultTime ?timestamp;        sosa:observedProperty ?property;       	sosa:hasFeatureOfInterest ?place;       	sosa:hasSimpleResult ?value.              }FILTER (xsd:dateTime(?timestamp) > ?from && xsd:dateTime(?timestamp) < ?to)} ORDER BY ?timestamp',
+        'SELECT ?a ?timestamp ?value WHERE {  GRAPH <http://covid19/observation/history> {?a rdf:type sosa:Observation; sosa:resultTime ?timestamp; sosa:observedProperty ?property; sosa:hasFeatureOfInterest ?place; sosa:hasResult ?res. ?res rdf:type ?type; qudt:unit ?unit; qudt:numericValue ?value. } FILTER (xsd:dateTime(?timestamp) > ?from && xsd:dateTime(?timestamp) < ?to)} ORDER BY ?timestamp',
       forcedBindings: {
         from: {
           type: 'literal',
@@ -79,12 +79,11 @@ export const jsap = {
       }
     },
     MAP_PLACES: {
-      sparql:
-        'SELECT  * FROM <http://covid19/context> FROM <http://covid19/observation> WHERE {?place rdf:type gn:Feature; gn:countryCode ?code ; gn:featureClass ?class ; gn:name ?name ;  gn:lat ?lat ; gn:long ?lon . FILTER NOT EXISTS {?place gn:parentFeature ?parent} . ?obs rdf:type sosa:Observation ; sosa:hasFeatureOfInterest ?place ; sosa:observedProperty <http://covid19#TotalCases>; sosa:hasResult  ?res . ?res qudt:numericValue ?cases}'
+      sparql: 'SELECT  * FROM <http://covid19/context> FROM <http://covid19/observation> WHERE {?place rdf:type gn:Feature; gn:countryCode ?code ; gn:featureClass ?class ; gn:name ?name ;  gn:lat ?lat ; gn:long ?lon . FILTER NOT EXISTS {?place gn:featureCode gn:A.ADM2} . ?obs rdf:type sosa:Observation ; sosa:hasFeatureOfInterest ?place ; sosa:observedProperty <http://covid19#TotalCases>; sosa:hasResult  ?res . ?res qudt:numericValue ?cases}'
     },
     CONTAINED_PLACES: {
       sparql:
-        'SELECT ?child ?name (COUNT(?grandChild) as ?numOfChildren) WHERE {GRAPH <http://covid19/context> {?child gn:parentFeature ?root ;gn:name ?name .OPTIONAL {?grandChild gn:parentFeature ?child .}}} GROUP BY ?child ?name',
+        'SELECT ?child ?name (COUNT(?grandChild) as ?numOfChildren) WHERE {GRAPH <http://covid19/context> {?child gn:parentFeature ?root ;gn:name ?name . FILTER(?name != \'In fase di definizione/aggiornamento ()\') OPTIONAL {?grandChild gn:parentFeature ?child .}}} GROUP BY ?child ?name',
       forcedBindings: {
         root: {
           type: 'uri',
