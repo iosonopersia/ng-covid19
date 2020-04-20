@@ -1,0 +1,42 @@
+<div class="card">
+  <div class="card-header">
+    Feature of interest
+  </div>
+  <div class="card-body places-tree-body">
+    <ul
+      ngbNav
+      [(activeId)]="selectedURI"
+      class="nav-pills"
+      [roles]="false"
+      [orientation]="'vertical'"
+      *ngIf="shownTree"
+    >
+      <li [ngbNavItem]="shownTree.node.placeURI">
+        <a
+          ngbNavLink
+          (click)="
+            onSelectedURI({
+              placeURI: shownTree.node.placeURI,
+              placeLabel: shownTree.node.placeLabel
+            })
+          "
+          >{{ shownTree.node.placeLabel }}</a
+        >
+        <ul class="nav-pills" *ngFor="let child of shownTree.children">
+          <li [ngbNavItem]="child.node.placeURI">
+            <a
+              ngbNavLink
+              (click)="
+                onSelectedURI({
+                  placeURI: child.node.placeURI,
+                  placeLabel: child.node.placeLabel
+                })
+              "
+              >{{ child.node.placeLabel }}</a
+            >
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
