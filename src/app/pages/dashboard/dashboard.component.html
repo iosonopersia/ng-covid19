@@ -1,11 +1,10 @@
 <app-page>
   <ul ngbNav [activeId]="route.fragment | async" class="nav-tabs">
-    <li [ngbNavItem]="link.fragment" *ngFor="let link of links">
-      <a ngbNavLink routerLink="." [fragment]="link.fragment">{{
+    <li [ngbNavItem]="link.path" *ngFor="let link of links">
+      <a ngbNavLink [routerLink]="link.path" >{{
         link.title
       }}</a>
     </li>
   </ul>
-
   <router-outlet></router-outlet>
 </app-page>

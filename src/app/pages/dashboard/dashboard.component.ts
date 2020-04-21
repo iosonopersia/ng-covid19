@@ -8,8 +8,9 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   links = [
-    { title: 'One', fragment: 'one' },
-    { title: 'Two', fragment: 'two' }
+    { title: 'Query', path: 'query' },
+    { title: 'Subscribe', path: 'subscribe' },
+    { title: 'Help', path: 'help' }
   ];
 
   constructor(public route: ActivatedRoute) {}
