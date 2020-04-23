@@ -22,6 +22,7 @@
     "@angular/router": "^9.1.2",
     "@arces-wot/sepa-js": "^0.10.7",
     "@ng-bootstrap/ng-bootstrap": "^6.0.3",
+    "@triply/yasgui": "^4.0.114",
     "@types/file-saver": "^2.0.1",
     "@types/leaflet": "^1.5.12",
     "angular-plotly.js": "^2.0.0",

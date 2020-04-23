@@ -26,11 +26,13 @@
             "styles": [
               "src/styles.css",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "./node_modules/leaflet/dist/leaflet.css"
+              "./node_modules/leaflet/dist/leaflet.css",
+              "./node_modules/@triply/yasgui/build/yasgui.min.css"
             ],
             "scripts": [
               "src/assets/sepa.js",
-              "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js"
+              "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js",
+              "./node_modules/@triply/yasgui/build/yasgui.min.js"
             ]
           },
           "configurations": {
@@ -95,11 +97,13 @@
             "styles": [
               "src/styles.css",
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "./node_modules/leaflet/dist/leaflet.css"
+              "./node_modules/leaflet/dist/leaflet.css",
+              "./node_modules/@triply/yasgui/build/yasgui.min.css"
             ],
             "scripts": [
               "src/assets/sepa.js",
-              "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js"
+              "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js",
+              "./node_modules/@triply/yasgui/build/yasgui.min.js"
             ]
           }
         },
