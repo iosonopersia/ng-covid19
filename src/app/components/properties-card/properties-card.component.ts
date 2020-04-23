@@ -1,12 +1,7 @@
 import { IPlaceNode } from './../../services/SEPA/queryResults.model';
 import { SharedStateService } from './../../services/SharedState/shared-state.service';
 import { SEPASubscriptionsService } from './../../services/SEPA/SEPASubscriptions/sepasubscriptions.service';
-import {
-  Component,
-  OnInit,
-  Input,
-  OnDestroy
-} from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IObservation } from 'src/app/services/SEPA/queryResults.model';
 import { List } from 'immutable';
@@ -37,13 +32,18 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscriptions = this.sharedState.treeSelectedPlace$.subscribe(selectedPlace =>
-      this.onSelectedPlace(selectedPlace)
+    this.subscriptions.add(
+      this.sharedState.treeSelectedPlace$.subscribe((selectedPlace) => {
+        this.selectedPlace = selectedPlace;
+        this.observations = this.map
+          ? this.map.get(selectedPlace.placeURI)
+          : List<IObservation>();
+      })
     );
     switch (this.title) {
       case 'COVID-19': {
-        this.subscriptions = this.sepaSubs.covid19Observations$.subscribe(
-          map => {
+        this.subscriptions.add(
+          this.sepaSubs.covid19Observations$.subscribe((map) => {
             this.map = map;
             this.observations = this.map.get(this.selectedPlace.placeURI);
             if (this.observations) {
@@ -52,31 +52,26 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
               >().timestamp.value;
               this.timestamp = new Date(timestampString).toLocaleString();
             }
-          }
+          })
         );
         break;
       }
       case 'Popolazione': {
-        this.subscriptions = this.sepaSubs.istatObservations$.subscribe(map => {
-          this.map = map;
-          this.observations = this.map.get(this.selectedPlace.placeURI);
-          if (this.observations) {
-            const timestampString: string = this.observations.first<
-              IObservation
-            >().timestamp.value;
-            this.timestamp = new Date(timestampString).toLocaleDateString();
-          }
-        });
+        this.subscriptions.add(
+          this.sepaSubs.istatObservations$.subscribe((map) => {
+            this.map = map;
+            this.observations = this.map.get(this.selectedPlace.placeURI);
+            if (this.observations) {
+              const timestampString: string = this.observations.first<
+                IObservation
+              >().timestamp.value;
+              this.timestamp = new Date(timestampString).toLocaleDateString();
+            }
+          })
+        );
         break;
       }
     }
-  }
-
-  onSelectedPlace(selectedPlace: IPlaceNode) {
-    this.selectedPlace = selectedPlace;
-    this.observations = this.map
-      ? this.map.get(selectedPlace.placeURI)
-      : List<IObservation>();
   }
 
   ngOnDestroy() {

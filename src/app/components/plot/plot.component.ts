@@ -1,5 +1,8 @@
 import { SharedStateService } from './../../services/SharedState/shared-state.service';
-import { IPlaceNode, IProperty } from './../../services/SEPA/queryResults.model';
+import {
+  IPlaceNode,
+  IProperty
+} from './../../services/SEPA/queryResults.model';
 import { SEPAQueriesService } from './../../services/SEPA/SEPAQueries/sepaqueries.service';
 import {
   Component,
@@ -32,38 +35,36 @@ export class PlotComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sepaQueries.queryHistory(
-      'http://covid19/context/country/ITA',
-      'http://covid19#TotalCases'
-    );
+    this.updatePlot([], [], 'Loading...');
 
-    this.updatePlot([], [] , 'Loading...');
-
-    this.subscriptions = this.sharedState.treeSelectedPlace$.subscribe(
-      place => {
+    this.subscriptions.add(
+      this.sharedState.treeSelectedPlace$.subscribe((place) => {
         this.place = place;
         this.checkPlot();
-      }
+      })
     );
 
-    this.subscriptions = this.sharedState.selectedProperty$.subscribe(
-      property => {
+    this.subscriptions.add(
+      this.sharedState.selectedProperty$.subscribe((property) => {
         this.property = property;
         this.checkPlot();
-      }
+      })
     );
 
-    this.subscriptions = this.sepaQueries.history$.subscribe(history => {
-      const x: Date[] = [];
-      const y: number[] = [];
-      for (const historyPoint of history) {
-        x.push(new Date(historyPoint.timestamp.value));
-        y.push(parseInt(historyPoint.value.value, 10));
-      }
+    this.subscriptions.add(
+      this.sepaQueries.history$.subscribe((history) => {
+        const x: Date[] = [];
+        const y: number[] = [];
+        for (const historyPoint of history) {
+          x.push(new Date(historyPoint.timestamp.value));
+          y.push(parseInt(historyPoint.value.value, 10));
+        }
 
-      const title = this.place.placeLabel + ' - ' + this.property.propertyLabel;
-      this.updatePlot(x, y, title);
-    });
+        const title =
+          this.place.placeLabel + ' - ' + this.property.propertyLabel;
+        this.updatePlot(x, y, title);
+      })
+    );
   }
 
   private updatePlot(x: Date[], y: number[], title: string) {
@@ -100,6 +101,9 @@ export class PlotComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.sepaQueries.queryHistory(this.place.placeURI, this.property.propertyURI);
+    this.sepaQueries.queryHistory(
+      this.place.placeURI,
+      this.property.propertyURI
+    );
   }
 }

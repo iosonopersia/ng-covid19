@@ -5,7 +5,7 @@
   <div class="card-body places-tree-body">
     <ul
       ngbNav
-      [(activeId)]="selectedURI"
+      [activeId]="selectedPlace.placeURI"
       class="nav-pills"
       [roles]="false"
       [orientation]="'vertical'"
@@ -15,7 +15,7 @@
         <a
           ngbNavLink
           (click)="
-            onSelectedURI({
+            onSelectedPlace({
               placeURI: shownTree.node.placeURI,
               placeLabel: shownTree.node.placeLabel
             })
@@ -27,7 +27,7 @@
             <a
               ngbNavLink
               (click)="
-                onSelectedURI({
+                onSelectedPlace({
                   placeURI: child.node.placeURI,
                   placeLabel: child.node.placeLabel
                 })

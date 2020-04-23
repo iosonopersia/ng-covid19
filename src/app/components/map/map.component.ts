@@ -21,7 +21,7 @@ export interface IMarker {
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private map: L.Map;
@@ -29,7 +29,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private italyMarker: L.Marker;
   private subscriptions: Subscription;
 
-  constructor(private sepaSubs: SEPASubscriptionsService, private sharedState: SharedStateService) {
+  constructor(
+    private sepaSubs: SEPASubscriptionsService,
+    private sharedState: SharedStateService
+  ) {
     this.map = undefined;
     this.markers = [];
     this.italyMarker = undefined;
@@ -42,10 +45,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initMap();
-    this.subscriptions = this.sepaSubs.places$.subscribe(places => {
-      this.clearMarkers();
-      this.drawMarkers(places.toArray());
-    });
+    this.subscriptions.add(
+      this.sepaSubs.places$.subscribe(places => {
+        this.clearMarkers();
+        this.drawMarkers(places.toArray());
+      })
+    );
   }
 
   private clearMarkers() {

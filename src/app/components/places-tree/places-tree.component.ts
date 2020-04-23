@@ -21,7 +21,8 @@ import { Subscription } from 'rxjs';
 export class PlacesTreeComponent implements OnInit, OnDestroy {
   private placesTree: IPlaceTree;
   shownTree: IPlaceTree;
-  selectedURI: string;
+  selectedPlace: IPlaceNode;
+  private rootPlace: IPlaceNode;
   private subscriptions: Subscription;
 
   constructor(
@@ -41,31 +42,38 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
       placeLabel: 'Italy'
     };
     this.sepaQueries.queryPlaceTree(italy);
-    this.sepaQueries.placeTree$.subscribe(tree => {
-      this.placesTree = tree;
-      this.shownTree = this.placesTree;
-      this.selectedURI = tree.node.placeURI;
-      // Subscribe to mapSelectedPlace$ only when we
-      // already obtained the place tree:
-      this.subscriptions = this.sharedState.mapSelectedPlace$.subscribe(
-        selectedPlace => this.onNewRootPlace(selectedPlace)
-      );
-    });
-    this.subscriptions = this.sharedState.treeSelectedPlace$.subscribe(
-      selectedPlace => {
-        this.selectedURI = selectedPlace.placeURI;
-      }
+
+    this.subscriptions.add(
+      this.sepaQueries.placeTree$.subscribe((tree) => {
+        this.placesTree = tree;
+        this.checkPlaceTree();
+      })
+    );
+    this.subscriptions.add(
+      this.sharedState.mapSelectedPlace$.subscribe((selectedPlace) => {
+        this.rootPlace = selectedPlace;
+        this.checkPlaceTree();
+      })
+    );
+    this.subscriptions.add(
+      this.sharedState.treeSelectedPlace$.subscribe((selectedPlace) => {
+        this.selectedPlace = selectedPlace;
+      })
     );
   }
 
-  private onNewRootPlace(newRoot: IPlaceNode) {
-    if (this.placesTree.node.placeURI === newRoot.placeURI) {
+  private checkPlaceTree() {
+    if (!this.placesTree || !this.rootPlace) {
+      return;
+    }
+
+    if (this.placesTree.node.placeURI === this.rootPlace.placeURI) {
       this.shownTree = this.placesTree;
     } else {
       // The new root place is not the root node of this.placesTree.
       // We must search among its first level children.
-      this.shownTree = this.placesTree.children.find(child => {
-        return child.node.placeURI === newRoot.placeURI;
+      this.shownTree = this.placesTree.children.find((child) => {
+        return child.node.placeURI === this.rootPlace.placeURI;
       });
       if (!this.shownTree) {
         throw new Error(
@@ -73,11 +81,13 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
         );
       }
     }
-    this.selectedURI = this.shownTree.node.placeURI; // Remember to change selection to the new root place
-    // this.sharedState.onTreeSelectedPlace(this.shownTree.node);
+    if (this.selectedPlace.placeURI !== this.shownTree.node.placeURI) {
+      // Remember to change selection to the new root place:
+      this.sharedState.onTreeSelectedPlace(this.shownTree.node);
+    }
   }
 
-  onSelectedURI(selectedPlace: IPlaceNode) {
+  onSelectedPlace(selectedPlace: IPlaceNode) {
     this.sharedState.onTreeSelectedPlace(selectedPlace);
   }
 }
