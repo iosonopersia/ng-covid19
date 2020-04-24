@@ -101,7 +101,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private addMarker(place: IMapPlace) {
     if (place.place.value === 'http://covid19/context/country/ITA') {
       const italyIcon = L.icon({
-        iconUrl: 'assets/italyFlag.png',
+        iconUrl: 'assets/images/italyFlag.png',
         iconSize: [24, 24]
       });
       this.italyMarker = L.marker([place.lat.value, place.lon.value], {

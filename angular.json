@@ -30,7 +30,7 @@
               "./node_modules/@triply/yasgui/build/yasgui.min.css"
             ],
             "scripts": [
-              "src/assets/sepa.js",
+              "src/assets/scripts/sepa.js",
               "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js",
               "./node_modules/@triply/yasgui/build/yasgui.min.js"
             ]
@@ -101,7 +101,7 @@
               "./node_modules/@triply/yasgui/build/yasgui.min.css"
             ],
             "scripts": [
-              "src/assets/sepa.js",
+              "src/assets/scripts/sepa.js",
               "./node_modules/plotly.js-basic-dist-min/plotly-basic.min.js",
               "./node_modules/@triply/yasgui/build/yasgui.min.js"
             ]
