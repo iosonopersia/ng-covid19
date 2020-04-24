@@ -1,7 +1,7 @@
 import { IPlaceNode } from './../../services/SEPA/queryResults.model';
 import { SharedStateService } from './../../services/SharedState/shared-state.service';
 import { SEPASubscriptionsService } from './../../services/SEPA/SEPASubscriptions/sepasubscriptions.service';
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IObservation } from 'src/app/services/SEPA/queryResults.model';
 import { List } from 'immutable';
@@ -9,7 +9,8 @@ import { List } from 'immutable';
 @Component({
   selector: 'app-properties-card',
   templateUrl: './properties-card.component.html',
-  styleUrls: ['./properties-card.component.css']
+  styleUrls: ['./properties-card.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PropertiesCardComponent implements OnInit, OnDestroy {
   @Input() title: string;
@@ -24,7 +25,8 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
 
   constructor(
     private sepaSubs: SEPASubscriptionsService,
-    private sharedState: SharedStateService
+    private sharedState: SharedStateService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.observations = List<IObservation>(); // Empty list
     this.timestamp = '';
@@ -38,6 +40,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
         this.observations = this.map
           ? this.map.get(selectedPlace.placeURI)
           : List<IObservation>();
+        this.cdRef.markForCheck();
       })
     );
     switch (this.title) {
@@ -52,6 +55,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
               >().timestamp.value;
               this.timestamp = new Date(timestampString).toLocaleString();
             }
+            this.cdRef.markForCheck();
           })
         );
         break;
@@ -67,6 +71,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
               >().timestamp.value;
               this.timestamp = new Date(timestampString).toLocaleDateString();
             }
+            this.cdRef.markForCheck();
           })
         );
         break;

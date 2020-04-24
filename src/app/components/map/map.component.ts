@@ -5,7 +5,8 @@ import {
   Component,
   AfterViewInit,
   ChangeDetectionStrategy,
-  OnDestroy
+  OnDestroy,
+  ChangeDetectorRef
 } from '@angular/core';
 import * as L from 'leaflet';
 import { IMapPlace } from 'src/app/services/SEPA/queryResults.model';
@@ -21,7 +22,7 @@ export interface IMarker {
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private map: L.Map;
@@ -31,7 +32,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private sepaSubs: SEPASubscriptionsService,
-    private sharedState: SharedStateService
+    private sharedState: SharedStateService,
+    // private cdRef: ChangeDetectorRef
   ) {
     this.map = undefined;
     this.markers = [];
@@ -40,6 +42,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearMarkers();
     this.subscriptions.unsubscribe();
   }
 
@@ -49,6 +52,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this.sepaSubs.places$.subscribe(places => {
         this.clearMarkers();
         this.drawMarkers(places.toArray());
+        // this.cdRef.markForCheck(); // No template bindings to update...
       })
     );
   }

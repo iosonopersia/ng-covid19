@@ -8,7 +8,8 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
-  OnDestroy
+  OnDestroy,
+  ChangeDetectorRef
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 
@@ -16,7 +17,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-plot',
   templateUrl: './plot.component.html',
   styleUrls: ['./plot.component.css'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlotComponent implements OnInit, OnDestroy {
   data: any;
@@ -29,7 +30,8 @@ export class PlotComponent implements OnInit, OnDestroy {
 
   constructor(
     private sepaQueries: SEPAQueriesService,
-    private sharedState: SharedStateService
+    private sharedState: SharedStateService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.subscriptions = new Subscription();
   }
@@ -41,6 +43,7 @@ export class PlotComponent implements OnInit, OnDestroy {
       this.sharedState.treeSelectedPlace$.subscribe((place) => {
         this.place = place;
         this.checkPlot();
+        this.cdRef.markForCheck();
       })
     );
 
@@ -48,6 +51,7 @@ export class PlotComponent implements OnInit, OnDestroy {
       this.sharedState.selectedProperty$.subscribe((property) => {
         this.property = property;
         this.checkPlot();
+        this.cdRef.markForCheck();
       })
     );
 
@@ -63,6 +67,7 @@ export class PlotComponent implements OnInit, OnDestroy {
         const title =
           this.place.placeLabel + ' - ' + this.property.propertyLabel;
         this.updatePlot(x, y, title);
+        this.cdRef.markForCheck();
       })
     );
   }

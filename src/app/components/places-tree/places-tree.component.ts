@@ -4,7 +4,8 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
-  OnDestroy
+  OnDestroy,
+  ChangeDetectorRef
 } from '@angular/core';
 import {
   IPlaceNode,
@@ -16,7 +17,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-places-tree',
   templateUrl: './places-tree.component.html',
   styleUrls: ['./places-tree.component.css'],
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlacesTreeComponent implements OnInit, OnDestroy {
   private placesTree: IPlaceTree;
@@ -27,7 +28,8 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
 
   constructor(
     private sepaQueries: SEPAQueriesService,
-    private sharedState: SharedStateService
+    private sharedState: SharedStateService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.subscriptions = new Subscription();
   }
@@ -47,17 +49,20 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
       this.sepaQueries.placeTree$.subscribe((tree) => {
         this.placesTree = tree;
         this.checkPlaceTree();
+        this.cdRef.markForCheck();
       })
     );
     this.subscriptions.add(
       this.sharedState.mapSelectedPlace$.subscribe((selectedPlace) => {
         this.rootPlace = selectedPlace;
         this.checkPlaceTree();
+        this.cdRef.markForCheck();
       })
     );
     this.subscriptions.add(
       this.sharedState.treeSelectedPlace$.subscribe((selectedPlace) => {
         this.selectedPlace = selectedPlace;
+        this.cdRef.markForCheck();
       })
     );
   }
@@ -81,7 +86,7 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
         );
       }
     }
-    if (this.selectedPlace.placeURI !== this.shownTree.node.placeURI) {
+    if (this.selectedPlace?.placeURI !== this.shownTree.node.placeURI) {
       // Remember to change selection to the new root place:
       this.sharedState.onTreeSelectedPlace(this.shownTree.node);
     }
