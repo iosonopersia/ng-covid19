@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomePageComponent } from './pages/home-page/home-page.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { QueryComponent } from './pages/query/query.component';
 import { HelpComponent } from './pages/help/help.component';
 
