@@ -1,0 +1,18 @@
+<app-page>
+  <div ngbDropdown class="d-inline-block">
+    <button class="btn btn-outline-primary" ngbDropdownToggle>
+      Seleziona una query
+    </button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+      <button
+        ngbDropdownItem
+        *ngFor="let query of queries"
+        (click)="onClick(query.sparql)"
+      >
+        {{ query.name }}
+      </button>
+    </div>
+  </div>
+  <div #yasqe></div>
+  <div #yasr></div>
+</app-page>
