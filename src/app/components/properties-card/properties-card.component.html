@@ -7,17 +7,20 @@
       }}</a
       >)</span
     >
-    <span class="float-right"><strong>Ultimo aggiornamento: </strong> {{ timestamp }}</span>
+    <span class="float-right"
+      ><strong>Ultimo aggiornamento: </strong> {{ timestamp }}</span
+    >
   </div>
-
-  <div class="card-body">
-    <div class="badge-container">
-      <app-observation-badge
-        *ngFor="let obs of observations"
-        [property]="obs.property.value"
-        [propertyLabel]="obs.label.value"
-        [value]="obs.value.value"
-      ></app-observation-badge>
+  <app-loader [loading]="isLoading">
+    <div class="card-body">
+      <div class="badge-container">
+        <app-observation-badge
+          *ngFor="let obs of observations"
+          [property]="obs.property.value"
+          [propertyLabel]="obs.label.value"
+          [value]="obs.value.value"
+        ></app-observation-badge>
+      </div>
     </div>
-  </div>
+  </app-loader>
 </div>

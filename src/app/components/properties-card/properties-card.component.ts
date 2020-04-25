@@ -1,7 +1,14 @@
 import { IPlaceNode } from './../../services/SEPA/queryResults.model';
 import { SharedStateService } from './../../services/SharedState/shared-state.service';
 import { SEPASubscriptionsService } from './../../services/SEPA/SEPASubscriptions/sepasubscriptions.service';
-import { Component, OnInit, Input, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IObservation } from 'src/app/services/SEPA/queryResults.model';
 import { List } from 'immutable';
@@ -10,7 +17,7 @@ import { List } from 'immutable';
   selector: 'app-properties-card',
   templateUrl: './properties-card.component.html',
   styleUrls: ['./properties-card.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PropertiesCardComponent implements OnInit, OnDestroy {
   @Input() title: string;
@@ -22,6 +29,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
   private map: Map<string, List<IObservation>>;
   observations: List<IObservation>;
   private subscriptions: Subscription;
+  isLoading: boolean;
 
   constructor(
     private sepaSubs: SEPASubscriptionsService,
@@ -30,6 +38,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
   ) {
     this.observations = List<IObservation>(); // Empty list
     this.timestamp = '';
+    this.isLoading = true;
     this.subscriptions = new Subscription();
   }
 
@@ -37,9 +46,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.sharedState.treeSelectedPlace$.subscribe((selectedPlace) => {
         this.selectedPlace = selectedPlace;
-        this.observations = this.map
-          ? this.map.get(selectedPlace.placeURI)
-          : List<IObservation>();
+        this.checkPropertiesCard();
         this.cdRef.markForCheck();
       })
     );
@@ -48,13 +55,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
           this.sepaSubs.covid19Observations$.subscribe((map) => {
             this.map = map;
-            this.observations = this.map.get(this.selectedPlace.placeURI);
-            if (this.observations) {
-              const timestampString: string = this.observations.first<
-                IObservation
-              >().timestamp.value;
-              this.timestamp = new Date(timestampString).toLocaleString();
-            }
+            this.checkPropertiesCard();
             this.cdRef.markForCheck();
           })
         );
@@ -64,18 +65,26 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
           this.sepaSubs.istatObservations$.subscribe((map) => {
             this.map = map;
-            this.observations = this.map.get(this.selectedPlace.placeURI);
-            if (this.observations) {
-              const timestampString: string = this.observations.first<
-                IObservation
-              >().timestamp.value;
-              this.timestamp = new Date(timestampString).toLocaleDateString();
-            }
+            this.checkPropertiesCard();
             this.cdRef.markForCheck();
           })
         );
         break;
       }
+    }
+  }
+
+  private checkPropertiesCard() {
+    if (!this.selectedPlace || !this.map) {
+      return;
+    }
+
+    this.observations = this.map.get(this.selectedPlace.placeURI);
+    if (this.observations) {
+      const timestampString: string = this.observations.first<IObservation>()
+        .timestamp.value;
+      this.timestamp = new Date(timestampString).toLocaleString();
+      this.isLoading = false;
     }
   }
 

@@ -25,6 +25,7 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
   selectedPlace: IPlaceNode;
   private rootPlace: IPlaceNode;
   private subscriptions: Subscription;
+  isLoading: boolean;
 
   constructor(
     private sepaQueries: SEPAQueriesService,
@@ -32,6 +33,7 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
     private cdRef: ChangeDetectorRef
   ) {
     this.subscriptions = new Subscription();
+    this.isLoading = true;
   }
 
   ngOnDestroy(): void {
@@ -90,6 +92,8 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
       // Remember to change selection to the new root place:
       this.sharedState.onTreeSelectedPlace(this.shownTree.node);
     }
+
+    this.isLoading = false;
   }
 
   onSelectedPlace(selectedPlace: IPlaceNode) {
