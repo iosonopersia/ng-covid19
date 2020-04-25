@@ -17,9 +17,8 @@ import { ObservationBadgeComponent } from './components/observation-badge/observ
 import { PropertiesCardComponent } from './components/properties-card/properties-card.component';
 import { ObservationsComponent } from './components/observations/observations.component';
 import { PlacesTreeComponent } from './components/places-tree/places-tree.component';
-import { SubscribeComponent } from './pages/dashboard/subscribe/subscribe.component';
-import { HelpComponent } from './pages/dashboard/help/help.component';
-import { QueryComponent } from './pages/dashboard/query/query.component';
+import { HelpComponent } from './pages/help/help.component';
+import { QueryComponent } from './pages/query/query.component';
 import { LoaderComponent } from './components/loader/loader.component';
 
 // La distro 'basic' di plotly mette a disposizione solamente 'scatter', 'bar' e 'pie'
@@ -39,7 +38,6 @@ import { PlotlyViaWindowModule } from 'angular-plotly.js';
     ObservationsComponent,
     PlacesTreeComponent,
     QueryComponent,
-    SubscribeComponent,
     HelpComponent,
     LoaderComponent
   ],
