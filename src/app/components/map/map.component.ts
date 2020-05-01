@@ -59,12 +59,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private clearMarkers() {
     if (this.markers) {
-      this.markers.forEach(marker => {
+      for (const marker of this.markers) {
         marker.bigCircle.off('click');
         marker.smallCircle.off('click');
         marker.bigCircle.removeFrom(this.map);
         marker.smallCircle.removeFrom(this.map);
-      });
+      }
       this.markers = [];
     }
     if (this.italyMarker) {
@@ -92,9 +92,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private drawMarkers(places: IMapPlace[]): void {
     if (places) {
-      places.forEach(place => {
+      for (const place of places) {
         this.addMarker(place);
-      });
+      }
     }
   }
 
