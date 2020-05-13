@@ -1,3 +1,4 @@
+import { SEPASubscriptionsService } from './../../services/SEPA/SEPASubscriptions/sepasubscriptions.service';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
@@ -8,7 +9,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 })
 export class ObservationsComponent implements OnInit {
 
-  constructor() {}
+  constructor(public sepaSubs: SEPASubscriptionsService) {}
 
   ngOnInit(): void {}
 }

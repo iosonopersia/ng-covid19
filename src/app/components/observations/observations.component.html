@@ -8,16 +8,19 @@
         [title]="'COVID-19'"
         [sourceLabel]="'Protezione Civile'"
         [sourceURL]="'https://github.com/pcm-dpc/COVID-19'"
+        [observable]="sepaSubs.covid19Observations$"
       ></app-properties-card>
       <app-properties-card
         [title]="'Popolazione'"
         [sourceLabel]="'ISTAT'"
         [sourceURL]="'http://dati.istat.it/Index.aspx?DataSetCode=DCIS_POPRES1#'"
+        [observable]="sepaSubs.istatObservations$"
       ></app-properties-card>
       <app-properties-card
         [title]="'Qualità dell\'aria'"
-        [sourceLabel]="'AQI'"
-        [sourceURL]="'http://dati.istat.it/Index.aspx?DataSetCode=DCIS_POPRES1#'"
+        [sourceLabel]="'aqicn.org'"
+        [sourceURL]="'https://aqicn.org/api/'"
+        [observable]="sepaSubs.aqiObservations$"
       ></app-properties-card>
     </div>
   </div>

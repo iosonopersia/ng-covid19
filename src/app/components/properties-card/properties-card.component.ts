@@ -9,7 +9,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { IObservation } from 'src/app/services/SEPA/queryResults.model';
 import { List } from 'immutable';
 
@@ -23,6 +23,8 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
   @Input() title: string;
   @Input() sourceLabel: string;
   @Input() sourceURL: string;
+  @Input() observable: Observable<Map<string, List<IObservation>>>;
+
   timestamp: string;
   private selectedPlace: IPlaceNode;
 
@@ -52,41 +54,16 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
         this.cdRef.markForCheck();
       })
     );
-    switch (this.title) {
-      case 'COVID-19': {
-        this.subscriptions.add(
-          this.sepaSubs.covid19Observations$.subscribe((map) => {
-            this.map = map;
-            this.receivedData++;
-            this.checkPropertiesCard();
-            this.cdRef.markForCheck();
-          })
-        );
-        break;
-      }
-      case 'Popolazione': {
-        this.subscriptions.add(
-          this.sepaSubs.istatObservations$.subscribe((map) => {
-            this.map = map;
-            this.receivedData++;
-            this.checkPropertiesCard();
-            this.cdRef.markForCheck();
-          })
-        );
-        break;
-      }
-      case 'Qualità dell\'aria': {
-        this.subscriptions.add(
-          this.sepaSubs.aqiObservations$.subscribe((map) => {
-            this.map = map;
-            this.receivedData++;
-            this.checkPropertiesCard();
-            this.cdRef.markForCheck();
-          })
-        );
-        break;
-      }
-    }
+   
+    this.subscriptions.add(
+      this.observable.subscribe((map) => {
+        this.map = map;
+        this.receivedData++;
+        this.checkPropertiesCard();
+        this.cdRef.markForCheck();
+      })
+    );
+     
   }
 
   private checkPropertiesCard() {
