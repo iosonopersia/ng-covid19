@@ -10,5 +10,17 @@ export const properties = {
   'http://covid19#Recovered': 'btn-success',
   'http://covid19#TotalCases': 'btn-danger',
   'http://covid19#TestPerformed': 'btn-secondary',
-  'http://istat/demographics/context/TotalPeople': 'btn-primary'
+  'http://istat/demographics/context/TotalPeople': 'btn-primary',
+  "http://airQuality/context/no2": 'btn-primary',
+  "http://airQuality/context/so2": 'btn-primary',
+  "http://airQuality/context/w": 'btn-primary',
+  "http://airQuality/context/d": 'btn-primary',
+  "http://airQuality/context/p": 'btn-primary',
+  "http://airQuality/context/aqi": 'btn-primary',
+  "http://airQuality/context/o3": 'btn-primary',
+  "http://airQuality/context/co": 'btn-primary',
+  "http://airQuality/context/t": 'btn-primary',
+  "http://airQuality/context/r": 'btn-primary',
+  "http://airQuality/context/h": 'btn-primary',
+  "http://airQuality/context/distanceError": 'btn-primary',
   };
