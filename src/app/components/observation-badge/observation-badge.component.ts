@@ -18,6 +18,7 @@ export class ObservationBadgeComponent implements OnInit {
   @Input() property: string;
   @Input() propertyLabel: string;
   @Input() value: string;
+  @Input() unitSymbol: string;
 
   class: string;
 

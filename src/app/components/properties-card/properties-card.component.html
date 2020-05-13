@@ -20,6 +20,7 @@
             [property]="obs.property.value"
             [propertyLabel]="obs.label.value"
             [value]="obs.value.value"
+            [unitSymbol]="(obs.symbol) ? obs.symbol.value : ''"
           ></app-observation-badge>
         </div>
         <div *ngIf="!observations && receivedData > 1">
