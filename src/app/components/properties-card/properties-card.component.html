@@ -14,12 +14,17 @@
   <app-loader [loading]="isLoading">
     <div class="card-body">
       <div class="badge-container">
-        <app-observation-badge
-          *ngFor="let obs of observations"
-          [property]="obs.property.value"
-          [propertyLabel]="obs.label.value"
-          [value]="obs.value.value"
-        ></app-observation-badge>
+        <div *ngIf="observations">
+          <app-observation-badge
+            *ngFor="let obs of observations"
+            [property]="obs.property.value"
+            [propertyLabel]="obs.label.value"
+            [value]="obs.value.value"
+          ></app-observation-badge>
+        </div>
+        <div *ngIf="!observations && receivedData > 1">
+          Dati assenti per il luogo selezionato
+        </div>
       </div>
     </div>
   </app-loader>

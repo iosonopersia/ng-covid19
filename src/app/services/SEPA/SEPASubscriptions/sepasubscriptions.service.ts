@@ -26,6 +26,11 @@ export class SEPASubscriptionsService {
   private ISTAT_OBSERVATIONS: Subject<Map<string, List<IObservation>>>;
   istatObservations$: Observable<Map<string, List<IObservation>>>;
 
+  // <http://airQuality/observation> dataset
+  private aqiObservations: Map<string, List<IObservation>>;
+  private AQI_OBSERVATIONS: Subject<Map<string, List<IObservation>>>;
+  aqiObservations$: Observable<Map<string, List<IObservation>>>;
+
   // <http://covid19/context> dataset
   private places: List<IMapPlace>;
   private PLACES: Subject<List<IMapPlace>>;
@@ -57,6 +62,13 @@ export class SEPASubscriptionsService {
       Map<string, List<IObservation>>
     >(this.istatObservations);
     this.istatObservations$ = this.ISTAT_OBSERVATIONS.asObservable();
+
+    // <http://airQuality/observation> dataset
+    this.aqiObservations = new Map<string, List<IObservation>>(); // empty list
+    this.AQI_OBSERVATIONS = new BehaviorSubject<
+      Map<string, List<IObservation>>
+    >(this.aqiObservations);
+    this.aqiObservations$ = this.AQI_OBSERVATIONS.asObservable();
 
     // <http://covid19/context> dataset
     this.places = List<IMapPlace>(); // empty list
@@ -143,6 +155,35 @@ export class SEPASubscriptionsService {
         this.onIstatObservations(addedResults.results.bindings);
       }
     });
+
+    query =
+      this.prefixes +
+      ' ' +
+      this.bench.sparql(jsap.queries.OBSERVATIONS.sparql, {
+        qudtGraph: {
+          type: 'uri',
+          value: 'http://localhost:8890/DAV'
+        },
+        obsGraph: {
+          type: 'uri',
+          value: 'http://airQuality/observation'
+        },
+        proGraph: {
+          type: 'uri',
+          value: 'http://airQuality/context'
+        },
+        ctxGraph: {
+          type: 'uri',
+          value: 'http://covid19/context'
+        }
+      });
+
+    subscription = this.sepa.subscribe(query, jsap);
+    subscription.on('added', (addedResults: IQueryResult<IObservation>) => {
+      if (addedResults?.results?.bindings) {
+        this.onAqiObservations(addedResults.results.bindings);
+      }
+    });
   }
 
   private onCovid19Observations(bindings: IObservation[]) {
@@ -191,6 +232,30 @@ export class SEPASubscriptionsService {
     }
     // Notify subscribers
     this.ISTAT_OBSERVATIONS.next(this.istatObservations);
+  }
+
+  private onAqiObservations(bindings: IObservation[]) {
+    // Update the array
+    for (const observation of bindings) {
+      let obsList = this.aqiObservations.get(observation.place.value);
+      if (!obsList) {
+        obsList = List<IObservation>(); // Empty list
+      }
+      const index: number = obsList.findIndex((value: IObservation) => {
+        return observation.observation === value.observation;
+      });
+      if (index === -1) {
+        obsList = obsList.push(observation);
+      } else {
+        obsList = obsList.set(index, observation);
+      }
+      this.aqiObservations = this.aqiObservations.set(
+        observation.place.value,
+        obsList
+      );
+    }
+    // Notify subscribers
+    this.AQI_OBSERVATIONS.next(this.aqiObservations);
   }
 
   private onAddedPlaces(bindings: IMapPlace[]) {

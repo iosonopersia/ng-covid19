@@ -30,6 +30,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
   observations: List<IObservation>;
   private subscriptions: Subscription;
   isLoading: boolean;
+  receivedData: number;
 
   constructor(
     private sepaSubs: SEPASubscriptionsService,
@@ -39,6 +40,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
     this.observations = List<IObservation>(); // Empty list
     this.timestamp = '';
     this.isLoading = true;
+    this.receivedData = 0;
     this.subscriptions = new Subscription();
   }
 
@@ -55,6 +57,7 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
           this.sepaSubs.covid19Observations$.subscribe((map) => {
             this.map = map;
+            this.receivedData++;
             this.checkPropertiesCard();
             this.cdRef.markForCheck();
           })
@@ -65,6 +68,18 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
           this.sepaSubs.istatObservations$.subscribe((map) => {
             this.map = map;
+            this.receivedData++;
+            this.checkPropertiesCard();
+            this.cdRef.markForCheck();
+          })
+        );
+        break;
+      }
+      case 'Qualità dell\'aria': {
+        this.subscriptions.add(
+          this.sepaSubs.aqiObservations$.subscribe((map) => {
+            this.map = map;
+            this.receivedData++;
             this.checkPropertiesCard();
             this.cdRef.markForCheck();
           })
@@ -84,6 +99,8 @@ export class PropertiesCardComponent implements OnInit, OnDestroy {
       const timestampString: string = this.observations.first<IObservation>()
         .timestamp.value;
       this.timestamp = new Date(timestampString).toLocaleString();
+    }
+    if (this.observations || this.receivedData > 1) {
       this.isLoading = false;
     }
   }
