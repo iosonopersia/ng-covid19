@@ -1,1 +1,1 @@
-<button type="button" [class]="class" (click)="onClick()">{{ propertyLabel + '&nbsp;' }}<span class="badge badge-light">{{ value }}</span></button>
+<button type="button" [class]="class" (click)="onClick()">{{ propertyLabel + '&nbsp;' }}<span class="badge badge-light">{{ value | number : '1.0-2' }}</span></button>
