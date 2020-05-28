@@ -19,6 +19,7 @@ import { PlacesTreeComponent } from './components/places-tree/places-tree.compon
 import { HelpComponent } from './pages/help/help.component';
 import { QueryComponent } from './pages/query/query.component';
 import { LoaderComponent } from './components/loader/loader.component';
+import { SupersetComponent } from './pages/superset/superset.component';
 
 // La distro 'basic' di plotly mette a disposizione solamente 'scatter', 'bar' e 'pie'
 import { PlotlyViaWindowModule } from 'angular-plotly.js';
@@ -37,19 +38,20 @@ import { PlotlyViaWindowModule } from 'angular-plotly.js';
     PlacesTreeComponent,
     QueryComponent,
     HelpComponent,
-    LoaderComponent
+    LoaderComponent,
+    SupersetComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     PlotlyViaWindowModule,
-    NgbModule
+    NgbModule,
   ],
   providers: [
     SEPASubscriptionsService,
     SEPAQueriesService,
-    SharedStateService
+    SharedStateService,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

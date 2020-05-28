@@ -1,0 +1,18 @@
+<app-page>
+  <iframe
+    *ngIf="dashboardName === 'covidFreeDashboard'"
+    seamless
+    frameBorder="0"
+    scrolling="yes"
+    src="http://sepa.vaimee.it:8088/superset/dashboard/covidFreeDashboard"
+  >
+  </iframe>
+  <iframe
+    *ngIf="dashboardName === 'airQualityDashboard'"
+    seamless
+    frameBorder="0"
+    scrolling="yes"
+    src="http://sepa.vaimee.it:8088/superset/dashboard/airQualityDashboard"
+  >
+  </iframe>
+</app-page>
