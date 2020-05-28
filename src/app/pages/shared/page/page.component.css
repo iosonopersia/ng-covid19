@@ -1,0 +1,10 @@
+/* main {
+    max-height: 100vh;
+    overflow-y: scroll;
+} */
+.mainDiv {
+    position: absolute;
+    /*top: 40px; Header Height*/
+    bottom: 0px; /* Footer Height */
+    width: 100%;
+}
