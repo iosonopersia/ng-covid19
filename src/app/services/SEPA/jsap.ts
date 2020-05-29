@@ -58,7 +58,7 @@ export const jsap = {
     },
     HISTORY: {
       sparql:
-        'SELECT ?a ?timestamp ?value WHERE {  GRAPH <http://covid19/observation/history> {?a rdf:type sosa:Observation; sosa:resultTime ?timestamp; sosa:observedProperty ?property; sosa:hasFeatureOfInterest ?place; sosa:hasResult ?res. ?res rdf:type ?type; qudt:unit ?unit; qudt:numericValue ?value. } FILTER (xsd:dateTime(?timestamp) > ?from && xsd:dateTime(?timestamp) < ?to)} ORDER BY ?timestamp',
+        'SELECT ?a ?timestamp ?value FROM <http://covid19/observation/history> FROM <http://airQuality/observation/history> WHERE { ?a rdf:type sosa:Observation; sosa:resultTime ?timestamp; sosa:observedProperty ?property; sosa:hasFeatureOfInterest ?place; sosa:hasResult ?res. ?res rdf:type ?type; qudt:unit ?unit; qudt:numericValue ?value. FILTER (xsd:dateTime(?timestamp) > ?from && xsd:dateTime(?timestamp) < ?to)} ORDER BY ?timestamp',
       forcedBindings: {
         from: {
           type: 'literal',
