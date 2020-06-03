@@ -18,7 +18,7 @@ export class SharedStateService {
   constructor() {
     const italy: IPlaceNode = {
       placeURI: 'http://covid19/context/country/ITA',
-      placeLabel: 'Italy'
+      placeLabel: 'Italia'
     };
 
     const casiTotali: IProperty = {

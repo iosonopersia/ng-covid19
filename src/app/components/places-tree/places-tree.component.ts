@@ -43,7 +43,7 @@ export class PlacesTreeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const italy: IPlaceNode = {
       placeURI: 'http://covid19/context/country/ITA',
-      placeLabel: 'Italy'
+      placeLabel: 'Italia'
     };
     this.sepaQueries.queryPlaceTree(italy);
 
