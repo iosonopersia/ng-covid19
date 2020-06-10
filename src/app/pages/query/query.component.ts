@@ -10,7 +10,6 @@ import {
 import { jsapQuery } from 'src/app/services/SEPA/jsapQuery';
 declare const Yasqe: any;
 declare const Yasr: any;
-declare const Yasgui: any;
 declare const Sepajs: any; // Global variable defined in src/assets/sepa.js
 
 @Component({
@@ -38,9 +37,6 @@ export class QueryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.queryEditor = new Yasqe(this.editorRef.nativeElement);
     this.resultsViewer = new Yasr(this.viewerRef.nativeElement);
 
-    // window['queryEditor'] = this.queryEditor;
-    // window['resultsViewer'] = this.resultsViewer;
-
     this.queryEditor.queryBtn.removeAllListeners();
     this.queryEditor.queryBtn.addEventListener('click', () =>
       this.executeQuery()
@@ -58,9 +54,6 @@ export class QueryComponent implements OnInit, AfterViewInit, OnDestroy {
   onClick(sparql: string) {
     this.queryEditor.setValue(this.prefixes + '\n' + sparql);
     this.queryEditor.autoformat();
-    //
-    this.queryEditor.collapsePrefixes(true);
-    this.queryEditor.collapsePrefixes(true);
     this.queryEditor.collapsePrefixes(true);
   }
 
@@ -82,7 +75,7 @@ export class QueryComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {}
 
   ngOnDestroy() {
-    this.queryEditor.queryBtn.removeAllListeners();
-    window['__zone_symbol__hashchangefalse'].pop(); // this ""should"" delete the listener added by Yasqe index.ts:103
+    this.queryEditor.destroy();
+    this.resultsViewer.destroy();
   }
 }
