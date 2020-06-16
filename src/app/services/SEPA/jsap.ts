@@ -43,7 +43,8 @@ export const jsap = {
     covid19: 'http://covid19#',
     time: 'http://www.w3.org/2006/time#',
     wgs84_pos: 'http://www.w3.org/2003/01/geo/wgs84_pos#',
-    gn: 'http://www.geonames.org/ontology#'
+    gn: 'http://www.geonames.org/ontology#',
+    xsd: 'http://www.w3.org/2001/XMLSchema#',
   },
   extended: {},
   updates: {},

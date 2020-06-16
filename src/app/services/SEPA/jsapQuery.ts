@@ -44,6 +44,7 @@ export const jsapQuery = {
     time: 'http://www.w3.org/2006/time#',
     wgs84_pos: 'http://www.w3.org/2003/01/geo/wgs84_pos#',
     gn: 'http://www.geonames.org/ontology#',
+    xsd: 'http://www.w3.org/2001/XMLSchema#',
   },
   queries: {
     OBSERVATIONS_COUNT: {
