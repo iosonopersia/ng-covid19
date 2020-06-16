@@ -116,7 +116,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     // Draw a circle which dimensions represent its associated value
     const radius = Math.max(
-      1000 * Math.pow(Math.log(place.cases.value), 2),
+      800 * Math.pow(Math.log(place.cases.value), 2),
       20000
     );
     const bigCircle = L.circle(
