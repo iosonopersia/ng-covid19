@@ -26,14 +26,11 @@ export interface IContainedPlace {
 // Query: MAP_PLACES
 export interface IMapPlace {
   place: IGraphData;
-  code: IGraphData;
-  class: IGraphData;
   name: IGraphData;
   lat: IGraphData;
   lon: IGraphData;
-  obs: IGraphData;
-  res: IGraphData;
-  cases: IGraphData;
+  totalCases: IGraphData;
+  dailyPositiveCases: IGraphData;
 }
 
 export interface ITree<T> {

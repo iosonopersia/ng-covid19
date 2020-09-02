@@ -80,7 +80,7 @@ export const jsap = {
       }
     },
     MAP_PLACES: {
-      sparql: 'SELECT  * FROM <http://covid19/context> FROM <http://covid19/observation> WHERE {?place rdf:type gn:Feature; gn:countryCode ?code ; gn:featureClass ?class ; gn:name ?name ;  gn:lat ?lat ; gn:long ?lon . FILTER NOT EXISTS {?place gn:featureCode gn:A.ADM2} . ?obs rdf:type sosa:Observation ; sosa:hasFeatureOfInterest ?place ; sosa:observedProperty <http://covid19#TotalCases>; sosa:hasResult  ?res . ?res qudt:numericValue ?cases}'
+      sparql: 'SELECT ?place ?name ?lat ?lon ?totalCases ?dailyPositiveCases FROM <http://covid19/context> FROM <http://covid19/observation> WHERE { ?place rdf:type gn:Feature; gn:countryCode ?code ; gn:featureClass ?class ; gn:name ?name ; gn:lat ?lat ; gn:long ?lon . FILTER NOT EXISTS {?place gn:featureCode gn:A.ADM2 } . ?obs1 rdf:type sosa:Observation ; sosa:hasFeatureOfInterest ?place ; sosa:observedProperty <http://covid19#TotalCases>; sosa:hasResult  ?res1 . ?obs2 rdf:type sosa:Observation ; sosa:hasFeatureOfInterest ?place ; sosa:observedProperty <http://covid19#DailyPositiveCases>; sosa:hasResult  ?res2 . ?res1 qudt:numericValue ?totalCases . ?res2 qudt:numericValue ?dailyPositiveCases}'
     },
     CONTAINED_PLACES: {
       sparql:
