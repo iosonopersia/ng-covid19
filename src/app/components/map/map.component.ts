@@ -6,7 +6,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   OnDestroy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
 } from '@angular/core';
 import * as L from 'leaflet';
 import { IMapPlace } from 'src/app/services/SEPA/queryResults.model';
@@ -22,18 +22,18 @@ export interface IMarker {
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapComponent implements AfterViewInit, OnDestroy {
   private map: L.Map;
   private markers: IMarker[];
   private italyMarker: L.Marker;
   private subscriptions: Subscription;
+  private maxTotalDailyCases: number;
 
   constructor(
     private sepaSubs: SEPASubscriptionsService,
-    private sharedState: SharedStateService,
-    // private cdRef: ChangeDetectorRef
+    private sharedState: SharedStateService // private cdRef: ChangeDetectorRef
   ) {
     this.map = undefined;
     this.markers = [];
@@ -49,7 +49,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.initMap();
     this.subscriptions.add(
-      this.sepaSubs.places$.subscribe(places => {
+      this.sepaSubs.places$.subscribe((places) => {
         this.clearMarkers();
         this.drawMarkers(places.toArray());
         // this.cdRef.markForCheck(); // No template bindings to update...
@@ -84,7 +84,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         minZoom: 2,
-        maxZoom: 8
+        maxZoom: 8,
       }
     );
     this.map.addLayer(cartodbPositron);
@@ -92,6 +92,15 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private drawMarkers(places: IMapPlace[]): void {
     if (places) {
+      this.maxTotalDailyCases = 0;
+      for (const place of places) {
+        if (place.place.value !== 'http://covid19/context/country/ITA') {
+          const thisValue = parseInt(place.dailyPositiveCases.value);
+          if (this.maxTotalDailyCases < thisValue) {
+            this.maxTotalDailyCases = thisValue;
+          }
+        }
+      }
       for (const place of places) {
         this.addMarker(place);
       }
@@ -102,11 +111,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     if (place.place.value === 'http://covid19/context/country/ITA') {
       const italyIcon = L.icon({
         iconUrl: 'assets/images/italyFlag.png',
-        iconSize: [24, 24]
+        iconSize: [24, 24],
       });
       this.italyMarker = L.marker([place.lat.value, place.lon.value], {
         title: name,
-        icon: italyIcon
+        icon: italyIcon,
       })
         .on('click', () => this.emitClickEvent(place))
         .addTo(this.map);
@@ -116,20 +125,28 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     // Draw a circle which dimensions represent its associated value
     const radius = Math.max(
-      800 * Math.pow(Math.log(place.cases.value), 2),
+      800 * Math.pow(Math.log(place.totalCases.value), 2),
       20000
     );
+    const percentage =
+      (1.0 * parseInt(place.dailyPositiveCases.value)) /
+      this.maxTotalDailyCases;
+    const markerColor: string = this.percentageToHsl(percentage, 120, 0);
     const bigCircle = L.circle(
       {
         lat: place.lat.value,
-        lng: place.lon.value
+        lng: place.lon.value,
       },
       {
         radius,
         stroke: false,
-        fillOpacity: 0.2
+        fillOpacity: 0.3,
+        color: markerColor,
       }
-    );
+    ).bindTooltip('Casi odierni: ' + place.dailyPositiveCases.value, {
+      permanent: false,
+      direction: 'right',
+    });
     bigCircle.on('click', () => this.emitClickEvent(place));
     this.map.addLayer(bigCircle);
 
@@ -137,12 +154,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     const smallCircle = L.circle(
       {
         lat: place.lat.value,
-        lng: place.lon.value
+        lng: place.lon.value,
       },
       {
         radius: 100,
         stroke: true,
-        fillOpacity: 1
+        fillOpacity: 1,
+        color: 'darkgrey',
       }
     );
     smallCircle.on('click', () => this.emitClickEvent(place));
@@ -151,15 +169,24 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.markers.push({
       id: place.place.value,
       bigCircle,
-      smallCircle
+      smallCircle,
     });
   }
 
   private emitClickEvent(place: IMapPlace) {
     const selectedPlace: IPlaceNode = {
       placeURI: place.place.value,
-      placeLabel: place.name.value
+      placeLabel: place.name.value,
     };
     this.sharedState.onMapSelectedPlace(selectedPlace);
+  }
+
+  private percentageToHsl(
+    percentage: number,
+    hue0: number,
+    hue1: number
+  ): string {
+    var hue = percentage * (hue1 - hue0) + hue0;
+    return 'hsl(' + hue + ', 100%, 50%)';
   }
 }
