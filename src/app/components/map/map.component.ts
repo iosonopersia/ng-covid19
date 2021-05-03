@@ -114,7 +114,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         iconSize: [24, 24],
       });
       this.italyMarker = L.marker([place.lat.value, place.lon.value], {
-        title: name,
+        title: 'italyMarker',
         icon: italyIcon,
       })
         .on('click', () => this.emitClickEvent(place))
@@ -125,8 +125,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     // Draw a circle which dimensions represent its associated value
     const radius = Math.max(
-      800 * Math.pow(Math.log(place.totalCases.value), 2),
-      20000
+      600 * Math.pow(Math.log(place.totalCases.value), 2),
+      15000
     );
     const percentage =
       (1.0 * parseInt(place.dailyPositiveCases.value)) /
