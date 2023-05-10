@@ -21,7 +21,7 @@
     "@angular/platform-browser": "^10.2.3",
     "@angular/platform-browser-dynamic": "^10.2.3",
     "@angular/router": "^10.2.3",
-    "@arces-wot/sepa-js": "^0.12.1",
+    "@arces-wot/sepa-js": "^0.13.2",
     "@ng-bootstrap/ng-bootstrap": "^7.0.0",
     "@triply/yasgui": "^4.1.3",
     "@types/file-saver": "^2.0.1",
