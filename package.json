@@ -27,7 +27,7 @@
     "@types/file-saver": "^2.0.1",
     "@types/leaflet": "^1.5.17",
     "angular-plotly.js": "^2.0.0",
-    "bootstrap": "^4.5.0",
+    "bootstrap": "^5.0.0",
     "file-saver": "^2.0.2",
     "immutable": "^4.0.0-rc.12",
     "leaflet": "^1.6.0",
